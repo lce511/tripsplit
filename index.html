@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <title>TripSplit</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="shell">
+    <section id="auth-view" class="card">
+      <h1>TripSplit</h1>
+      <p class="muted">LA Trip 2026 · Iris · Jason · Ashley</p>
+      <div class="tabs">
+        <button id="tab-login" class="tab active" type="button">登入</button>
+        <button id="tab-signup" class="tab" type="button">註冊</button>
+      </div>
+      <form id="auth-form">
+        <label>Email<input id="auth-email" type="email" autocomplete="email" required></label>
+        <label>密碼<input id="auth-password" type="password" minlength="6" autocomplete="current-password" required></label>
+        <button id="auth-submit" class="primary" type="submit">登入</button>
+      </form>
+      <p id="auth-message" class="message"></p>
+    </section>
+
+    <section id="claim-view" class="card hidden">
+      <h1>綁定旅行身分</h1>
+      <p class="muted">第一次登入時輸入自己的邀請碼；每組邀請碼只能使用一次。</p>
+      <form id="claim-form">
+        <label>邀請碼<input id="invite-code" autocapitalize="characters" autocomplete="off" required></label>
+        <button class="primary" type="submit">綁定身分</button>
+      </form>
+      <p id="claim-message" class="message"></p>
+      <button id="claim-logout" class="secondary" type="button">登出</button>
+    </section>
+
+    <section id="app-view" class="hidden">
+      <header class="topbar">
+        <div>
+          <h1>TripSplit</h1>
+          <p id="whoami" class="muted"></p>
+        </div>
+        <button id="logout-btn" class="secondary small" type="button">登出</button>
+      </header>
+
+      <section class="card">
+        <div class="row-between">
+          <div>
+            <p class="eyebrow">LA Trip 2026</p>
+            <h2>旅行分帳</h2>
+          </div>
+          <div id="expense-count" class="pill">0 筆</div>
+        </div>
+        <div id="totals" class="totals"></div>
+      </section>
+
+      <section class="card">
+        <h2 id="form-title">新增支出</h2>
+        <form id="expense-form">
+          <label>項目<input id="item" required placeholder="例如：晚餐、Uber、門票"></label>
+          <div class="two">
+            <label>幣別
+              <select id="currency">
+                <option>USD</option><option>TWD</option><option>JPY</option>
+                <option>EUR</option><option>GBP</option><option>KRW</option><option>EGP</option>
+              </select>
+            </label>
+            <label>金額<input id="amount" type="number" inputmode="decimal" min="0.01" step="0.01" required></label>
+          </div>
+          <div class="two">
+            <label>分類
+              <select id="category">
+                <option>餐飲</option><option>交通</option><option>住宿</option>
+                <option>門票</option><option>購物</option><option>其他</option>
+              </select>
+            </label>
+            <label>付款人<select id="payer"></select></label>
+          </div>
+          <label>日期<input id="expense-date" type="date" required></label>
+
+          <fieldset>
+            <legend>分攤方式</legend>
+            <div class="split-tabs">
+              <label><input type="radio" name="split-mode" value="equal" checked> 平均分攤</label>
+              <label><input type="radio" name="split-mode" value="custom"> 自訂金額</label>
+            </div>
+          </fieldset>
+
+          <div id="equal-panel">
+            <p class="label-text">誰一起分攤？</p>
+            <div id="equal-members" class="member-grid"></div>
+            <p id="equal-preview" class="muted"></p>
+          </div>
+
+          <div id="custom-panel" class="hidden">
+            <div class="row-between">
+              <p class="label-text">各自分攤金額</p>
+              <p id="custom-status" class="muted"></p>
+            </div>
+            <div id="custom-members"></div>
+          </div>
+
+          <label>備註<textarea id="note" rows="2" placeholder="可留空"></textarea></label>
+          <div class="actions">
+            <button class="primary" type="submit">儲存</button>
+            <button id="cancel-edit" class="secondary hidden" type="button">取消編輯</button>
+          </div>
+        </form>
+        <p id="expense-message" class="message"></p>
+      </section>
+
+      <section class="card">
+        <h2>誰欠誰</h2>
+        <p class="muted">各幣別獨立結算，不跨幣別互相抵銷。</p>
+        <div id="settlements"></div>
+      </section>
+
+      <section class="card">
+        <h2>支出紀錄</h2>
+        <div id="expense-list"></div>
+      </section>
+    </section>
+  </main>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
