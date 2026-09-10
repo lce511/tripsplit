@@ -228,6 +228,17 @@
     return out;
   }
 
+  function personalSpending(){
+    const totals=Object.fromEntries(state.members.map(m=>[m.id,{}]));
+    for(const e of state.expenses){
+      for(const s of e.expense_shares||[]){
+        totals[s.member_id] ||= {};
+        totals[s.member_id][e.currency]=roundCurrency((totals[s.member_id][e.currency]||0)+Number(s.amount),e.currency);
+      }
+    }
+    return totals;
+  }
+
   function render(){
     $("expense-count").textContent=`${state.expenses.length} 筆`;
     const totals={}; state.expenses.forEach(e=>totals[e.currency]=(totals[e.currency]||0)+Number(e.amount));
@@ -248,6 +259,15 @@
     }).join(""):`<p class="empty">還沒有支出紀錄。</p>`;
     $("expense-list").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editExpense(b.dataset.edit));
     $("expense-list").querySelectorAll("[data-delete]").forEach(b=>b.onclick=()=>deleteExpense(b.dataset.delete));
+
+    const spending=personalSpending();
+    const currencies=[...new Set(state.expenses.map(e=>e.currency))];
+    $("personal-spending").innerHTML=state.members.map(m=>{
+      const lines=currencies.length
+        ?currencies.map(c=>`<div class="person-spend-line"><span>${c}</span><strong>${fmt(spending[m.id]?.[c]||0,c)}</strong></div>`).join("")
+        :`<p class="empty">尚無支出</p>`;
+      return `<div class="person-spend-card"><h3>${esc(m.name)}</h3>${lines}</div>`;
+    }).join("");
   }
 
   sb.auth.onAuthStateChange(()=>setTimeout(route,0));
